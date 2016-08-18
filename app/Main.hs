@@ -1,30 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
-import Control.Applicative
 import Control.Concurrent.Async
+import Control.Lens
 import Data.Aeson
 import Data.Foldable
-import Network.HTTP.Client
+import Network.Wreq
 
-buildRequest :: String -> RequestBody -> IO Request
-buildRequest url body = do
-  nakedRequest <- parseRequest url
-  return (nakedRequest { method = "POST", requestBody = body })
+postTest s = do
+  r <- post "http://httpbin.org/post" (partText "q" s)
+  let Just obj = decode (r ^. responseBody)
+  pure (obj :: Object)
 
-send :: RequestBody -> IO ()
-send s = do
-  manager <- newManager defaultManagerSettings
-  request <- buildRequest "http://httpbin.org/post" s
-  response <- httpLbs request manager
-  let Just obj = decode (responseBody response)
-  print (obj :: Object)
-
-posts = [send "Hello",
-         send "There",
-         send "Foo",
-         send "Bar"]
+posts = map postTest ["Hello", "There", "Foo", "Bar"]
 
 main = do
   a <- runConcurrently $ asum (map Concurrently posts)
-  print $ a
+  print a

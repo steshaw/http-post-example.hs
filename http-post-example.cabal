@@ -28,7 +28,8 @@ executable http-post-example
                      , base
                      , bytestring
                      , http-post-example
-                     , http-client
+                     , lens
+                     , wreq
   default-language:    Haskell2010
 
 test-suite http-post-example-test
