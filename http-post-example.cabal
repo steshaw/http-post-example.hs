@@ -26,7 +26,6 @@ executable http-post-example
   build-depends:       aeson
                      , async
                      , base
-                     , bytestring
                      , http-post-example
                      , lens
                      , wreq
