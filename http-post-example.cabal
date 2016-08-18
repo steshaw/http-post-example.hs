@@ -28,6 +28,7 @@ executable http-post-example
                      , base
                      , http-post-example
                      , lens
+                     , lens-aeson
                      , wreq
   default-language:    Haskell2010
 
