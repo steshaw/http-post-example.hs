@@ -1,21 +1,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main where
-
-import Control.Concurrent.Async
+import Control.Concurrent.Conceit
+import Data.Maybe (maybe)
 import Control.Lens
 import Data.Aeson
 import Data.Aeson.Lens (key)
 import Data.Foldable
 import Network.Wreq
 
-echo :: Integer -> IO (Maybe Value)
-echo s = do
-  r <- post "http://httpbin.org/post" (toJSON s)
-  pure $ r ^? responseBody . key "json"
-
-posts = map echo [1..10]
+echo :: Integer -> IO (Either Value String)
+echo i =
+  if i == 5 then pure $ Right "5 fails"
+  else do
+    print i
+    r <- post "http://httpbin.org/post" (toJSON i)
+    pure $ maybe (Right "Malformed response") Left (r ^? responseBody . key "json")
 
 main = do
-  first <- runConcurrently $ asum (map Concurrently posts)
+  first <- mapConceit echo [1..10]
   print first
